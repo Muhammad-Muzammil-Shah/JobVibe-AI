@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Dashboard - JobVibe AI{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: rgba(6, 182, 212, 0.1); border-bottom: 1px solid rgba(6, 182, 212, 0.2);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="text-white fw-bold mb-1">👋 Welcome, {{ candidate.full_name }}</h1>
+                <p class="text-muted mb-0">Track your applications and interviews</p>
+            </div>
+            <a href="{{ url_for('main.main_jobs') }}" class="btn btn-primary">
+                🔍 Find Jobs
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Interview Notifications Banner -->
+    {% if notifications %}
+    {% for notif in notifications if notif.notification_type == 'interview_invite' and not notif.is_expired and not notif.is_read %}
+    <div class="glass-card d-flex align-items-center mb-4 p-4" style="border-left: 4px solid #10b981 !important;">
+        <span style="font-size: 2rem;" class="me-3">🎉</span>
+        <div class="flex-grow-1">
+            <strong style="color: #10b981;">{{ notif.title }}</strong>
+            <p class="mb-1 text-muted">{{ notif.message }}</p>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge fs-6 px-3 py-2" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                    Interview ID: <strong>{{ notif.interview_code }}</strong>
+                </span>
+                <small class="text-muted">
+                    ⏰ Valid for {{ notif.days_remaining }} more day(s)
+                </small>
+            </div>
+        </div>
+        <a href="{{ url_for('interview.verify_otp') }}" class="btn btn-success btn-lg">
+            🎥 Take Interview Now
+        </a>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="glass-card h-100">
+                <div class="p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 me-3" 
+                             style="width: 50px; height: 50px; background: rgba(99, 102, 241, 0.2);">
+                            <span style="font-size: 1.5rem;">📄</span>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0 small">Applications</h6>
+                            <h3 class="mb-0 fw-bold gradient-text">{{ stats.total_applications }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card h-100">
+                <div class="p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 me-3" 
+                             style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.2);">
+                            <span style="font-size: 1.5rem;">⭐</span>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0 small">Shortlisted</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #10b981;">{{ stats.shortlisted }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card h-100">
+                <div class="p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 me-3" 
+                             style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.2);">
+                            <span style="font-size: 1.5rem;">🎥</span>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0 small">Pending Interviews</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #f59e0b;">{{ stats.interviews_pending }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card h-100">
+                <div class="p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 me-3" 
+                             style="width: 50px; height: 50px; background: rgba(6, 182, 212, 0.2);">
+                            <span style="font-size: 1.5rem;">🔔</span>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0 small">Notifications</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #06b6d4;">{{ unread_count|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Interview Alert (Legacy support) -->
+    {% for app in applications if app.interview and not app.interview.is_completed %}
+    <div class="glass-card d-flex align-items-center mb-4 p-4" style="border-left: 4px solid #f59e0b !important;">
+        <span style="font-size: 1.5rem;" class="me-3">🎬</span>
+        <div class="flex-grow-1">
+            <strong style="color: #f59e0b;">Interview Pending!</strong> 
+            <span class="text-muted">You have an interview scheduled for {{ app.job.title }} at {{ app.job.company.company_name }}.</span>
+            <br>
+            <small class="text-muted">Interview ID: <code class="px-2 py-1 rounded" style="background: rgba(255,255,255,0.1);">{{ app.interview.interview_code }}</code></small>
+            {% if app.interview.expires_at %}
+            <br>
+            <small class="text-muted">Expires: {{ app.interview.expires_at.strftime('%b %d, %Y') }}</small>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('interview.verify_otp') }}" class="btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+            Take Interview Now
+        </a>
+    </div>
+    {% endfor %}
+    
+    <!-- Applications List -->
+    <div class="glass-card">
+        <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+            <h5 class="mb-0 fw-semibold text-white"><span class="me-2">📋</span>My Applications</h5>
+        </div>
+        <div class="p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Job Position</th>
+                            <th>Company</th>
+                            <th>AI Score</th>
+                            <th>Status</th>
+                            <th>Applied</th>
+                            <th class="pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-white">{{ app.job.title }}</strong>
+                                <br>
+                                <small class="text-muted">📍 {{ app.job.location or 'Remote' }}</small>
+                            </td>
+                            <td class="text-muted">{{ app.job.company.company_name }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress me-2" style="width: 60px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1);">
+                                        <div class="progress-bar" style="width: {{ app.ai_resume_score }}%; background: {% if app.ai_resume_score >= 70 %}#10b981{% elif app.ai_resume_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+                                    </div>
+                                    <span class="badge" style="background: {% if app.ai_resume_score >= 70 %}rgba(16, 185, 129, 0.2); color: #10b981;{% elif app.ai_resume_score >= 50 %}rgba(245, 158, 11, 0.2); color: #f59e0b;{% else %}rgba(239, 68, 68, 0.2); color: #ef4444;{% endif %}">
+                                        {{ app.ai_resume_score|round(1) }}%
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" style="background: {% if app.status == 'Applied' %}rgba(99, 102, 241, 0.2); color: #a5b4fc;{% elif app.status == 'Screening' %}rgba(6, 182, 212, 0.2); color: #06b6d4;{% elif app.status == 'Shortlisted' %}rgba(16, 185, 129, 0.2); color: #10b981;{% elif app.status == 'Interview' %}rgba(245, 158, 11, 0.2); color: #f59e0b;{% elif app.status == 'Rejected' %}rgba(239, 68, 68, 0.2); color: #ef4444;{% else %}rgba(16, 185, 129, 0.2); color: #10b981;{% endif %}">
+                                    {{ app.status }}
+                                </span>
+                                {% if app.interview and not app.interview.is_completed %}
+                                <br>
+                                <small style="color: #f59e0b;">
+                                    ⚠️ Interview pending
+                                </small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ app.applied_at.strftime('%b %d, %Y') }}</small>
+                            </td>
+                            <td class="pe-4">
+                                {% if app.interview and not app.interview.is_completed %}
+                                <a href="{{ url_for('interview.verify_otp') }}" class="btn btn-sm" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                                    🎥 Interview
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('candidate.candidate_view_application', app_id=app.app_id) }}" 
+                                   class="btn btn-sm btn-outline-light">
+                                    View
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="bi bi-inbox display-4 text-muted d-block mb-2"></i>
+                                <h5 class="text-white">No Applications Yet</h5>
+                                <p class="text-muted mb-3">Start applying for jobs to track your progress here</p>
+                                <a href="{{ url_for('main.main_jobs') }}" class="btn btn-primary">
+                                    <i class="bi bi-search me-2"></i>Browse Jobs
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

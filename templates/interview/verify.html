@@ -1,0 +1,692 @@
+{% extends "base.html" %}
+
+{% block title %}Start Interview - JobVibe AI{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    * {
+        font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #0a0a1a 0%, #0f0f2d 50%, #1a0a2e 100%) !important;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    
+    /* Animated Background */
+    .bg-animated {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        overflow: hidden;
+    }
+    
+    .bg-animated::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: 
+            radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+            radial-gradient(ellipse at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
+            radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+        animation: bgPulse 15s ease-in-out infinite;
+    }
+    
+    @keyframes bgPulse {
+        0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        50% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
+    }
+    
+    /* Floating Orbs */
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        animation: float 20s ease-in-out infinite;
+    }
+    
+    .orb-1 {
+        width: 400px;
+        height: 400px;
+        background: rgba(99, 102, 241, 0.3);
+        top: -100px;
+        right: -100px;
+        animation-delay: 0s;
+    }
+    
+    .orb-2 {
+        width: 300px;
+        height: 300px;
+        background: rgba(168, 85, 247, 0.25);
+        bottom: -50px;
+        left: -50px;
+        animation-delay: -5s;
+    }
+    
+    .orb-3 {
+        width: 200px;
+        height: 200px;
+        background: rgba(59, 130, 246, 0.2);
+        top: 50%;
+        left: 50%;
+        animation-delay: -10s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(30px, -30px) scale(1.05); }
+        50% { transform: translate(-20px, 20px) scale(0.95); }
+        75% { transform: translate(20px, 30px) scale(1.02); }
+    }
+    
+    /* Particle Effect */
+    .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        animation: particleFloat 15s linear infinite;
+    }
+    
+    @keyframes particleFloat {
+        0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+    }
+    
+    .navbar, footer {
+        display: none !important;
+    }
+    
+    .verify-container {
+        max-width: 540px;
+        margin: 0 auto;
+        padding: 40px 24px;
+        position: relative;
+        z-index: 10;
+        animation: slideUp 0.8s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Main Card */
+    .verify-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        animation: cardGlow 4s ease-in-out infinite;
+    }
+    
+    @keyframes cardGlow {
+        0%, 100% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 80px rgba(99, 102, 241, 0.1); }
+        50% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 120px rgba(139, 92, 246, 0.15); }
+    }
+    
+    /* Header */
+    .verify-header {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+        padding: 48px 36px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .verify-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        animation: headerShine 8s ease-in-out infinite;
+    }
+    
+    @keyframes headerShine {
+        0%, 100% { transform: translate(-30%, -30%); }
+        50% { transform: translate(30%, 30%); }
+    }
+    
+    .verify-header .icon {
+        width: 90px;
+        height: 90px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-size: 2.8rem;
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: iconPulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); }
+        50% { transform: scale(1.05); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3); }
+    }
+    
+    .verify-header h2 {
+        color: white;
+        font-weight: 800;
+        font-size: 2rem;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .verify-header p {
+        color: rgba(255, 255, 255, 0.85);
+        margin: 0;
+        font-size: 1.05rem;
+        position: relative;
+        z-index: 1;
+        font-weight: 400;
+    }
+    
+    /* Live Badge */
+    .live-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 8px 16px;
+        border-radius: 50px;
+        margin-top: 16px;
+        font-size: 0.85rem;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .live-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: livePulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes livePulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    
+    /* Body */
+    .verify-body {
+        padding: 36px;
+    }
+    
+    .form-group {
+        margin-bottom: 26px;
+        animation: fadeInUp 0.5s ease-out backwards;
+    }
+    
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .form-label {
+        color: rgba(255, 255, 255, 0.95);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .form-label i {
+        color: #a5b4fc;
+        font-size: 1rem;
+    }
+    
+    .form-control {
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 16px 20px;
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        width: 100%;
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.35);
+    }
+    
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(99, 102, 241, 0.6);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 8px 32px rgba(99, 102, 241, 0.2);
+        color: #fff;
+        outline: none;
+        transform: translateY(-2px);
+    }
+    
+    .form-control.code-input {
+        text-align: center;
+        letter-spacing: 6px;
+        font-weight: 700;
+        font-size: 1.3rem;
+        text-transform: uppercase;
+        background: rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.2);
+    }
+    
+    .form-text {
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 0.8rem;
+        text-align: center;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+        background-size: 200% 200%;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 18px 28px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        position: relative;
+        overflow: hidden;
+        animation: gradientFlow 3s ease infinite;
+    }
+    
+    @keyframes gradientFlow {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: 0.5s;
+    }
+    
+    .btn-submit:hover::before {
+        left: 100%;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(99, 102, 241, 0.5);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(-1px) scale(0.98);
+    }
+    
+    .btn-submit i {
+        font-size: 1.3rem;
+        animation: iconBounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes iconBounce {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+        margin: 32px 0;
+    }
+    
+    /* Tips Section */
+    .tips-section {
+        background: rgba(16, 185, 129, 0.05);
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        border-radius: 16px;
+        padding: 24px;
+    }
+    
+    .tips-section h6 {
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        font-size: 1rem;
+    }
+    
+    .tips-section h6 i {
+        color: #10b981;
+        font-size: 1.2rem;
+    }
+    
+    .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .tips-list li {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        padding: 10px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .tips-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .tips-list li:hover {
+        color: rgba(255, 255, 255, 0.9);
+        padding-left: 8px;
+    }
+    
+    .tips-list li::before {
+        content: '✓';
+        color: #10b981;
+        font-weight: bold;
+        font-size: 0.85rem;
+        background: rgba(16, 185, 129, 0.15);
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    .tips-list li strong {
+        color: #fbbf24;
+        background: rgba(251, 191, 36, 0.1);
+        padding: 2px 8px;
+        border-radius: 6px;
+    }
+    
+    /* Help Card */
+    .help-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 28px;
+        margin-top: 28px;
+        position: relative;
+        overflow: hidden;
+        animation: slideUp 0.8s ease-out 0.3s backwards;
+    }
+    
+    .help-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+    }
+    
+    .help-card h6 {
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        font-size: 1rem;
+    }
+    
+    .help-card h6 i {
+        color: #a5b4fc;
+        font-size: 1.2rem;
+    }
+    
+    .help-card p {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+    
+    .btn-help {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #c4b5fd;
+        padding: 12px 24px;
+        border-radius: 100px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-help:hover {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+        border-color: rgba(99, 102, 241, 0.5);
+        color: #fff;
+        transform: translateX(5px);
+    }
+    
+    /* Floating Decorations */
+    .decoration {
+        position: fixed;
+        pointer-events: none;
+        opacity: 0.4;
+        z-index: 1;
+    }
+    
+    .decoration-1 {
+        top: 15%;
+        right: 8%;
+        font-size: 2.5rem;
+        animation: floatDecor 6s ease-in-out infinite;
+    }
+    
+    .decoration-2 {
+        bottom: 20%;
+        left: 8%;
+        font-size: 2rem;
+        animation: floatDecor 8s ease-in-out infinite reverse;
+    }
+    
+    .decoration-3 {
+        top: 50%;
+        right: 15%;
+        font-size: 1.8rem;
+        animation: floatDecor 7s ease-in-out infinite;
+        animation-delay: -3s;
+    }
+    
+    @keyframes floatDecor {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-25px) rotate(15deg); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 576px) {
+        .verify-container { padding: 20px 16px; }
+        .verify-header { padding: 36px 24px; }
+        .verify-header h2 { font-size: 1.6rem; }
+        .verify-body { padding: 28px 24px; }
+        .form-control.code-input { letter-spacing: 4px; font-size: 1.1rem; }
+        .decoration { display: none; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Animated Background -->
+<div class="bg-animated">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="particles" id="particles"></div>
+</div>
+
+<!-- Floating Decorations -->
+<div class="decoration decoration-1">💼</div>
+<div class="decoration decoration-2">🚀</div>
+<div class="decoration decoration-3">⭐</div>
+
+<div class="verify-container">
+    <div class="verify-card">
+        <div class="verify-header">
+            <div class="icon">🎥</div>
+            <h2>Video Interview</h2>
+            <p>Verify your details to begin your journey</p>
+            <div class="live-badge">
+                <span class="live-dot"></span>
+                AI-Powered Assessment
+            </div>
+        </div>
+        
+        <div class="verify-body">
+            <form method="POST" action="{{ url_for('interview.verify_otp') }}">
+                <!-- Interview ID -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-key-fill"></i>Interview ID
+                    </label>
+                    <input type="text" class="form-control code-input" 
+                           name="interview_code" placeholder="INT-2025-XXXX" 
+                           maxlength="15" required autocomplete="off">
+                    <div class="form-text">
+                        <i class="bi bi-envelope"></i> Check your email for Interview ID
+                    </div>
+                </div>
+                
+                <!-- Candidate Name -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-person-fill"></i>Your Full Name
+                    </label>
+                    <input type="text" class="form-control" 
+                           name="candidate_name" placeholder="Enter your full name as in application"
+                           required autocomplete="name">
+                </div>
+                
+                <!-- Position Applied For -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-briefcase-fill"></i>Position Applied For
+                    </label>
+                    <input type="text" class="form-control" 
+                           name="position" placeholder="e.g., Python Developer, Data Analyst"
+                           required autocomplete="off">
+                </div>
+                
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-play-circle-fill"></i>
+                    Verify & Start Interview
+                </button>
+            </form>
+            
+            <div class="divider"></div>
+            
+            <div class="tips-section">
+                <h6><i class="bi bi-shield-check"></i>Before you begin:</h6>
+                <ul class="tips-list">
+                    <li>Ensure you're in a quiet, well-lit environment</li>
+                    <li>Check that your camera and microphone are working</li>
+                    <li>Use a stable internet connection</li>
+                    <li>Interview will be in <strong>fullscreen mode</strong> - do not exit</li>
+                    <li>Each question has a <strong>15 second</strong> time limit</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Help Card -->
+    <div class="help-card">
+        <h6><i class="bi bi-question-circle-fill"></i>Didn't receive Interview ID?</h6>
+        <p>Interview ID is sent to your registered email when you're shortlisted. Check your spam folder or contact the company HR for assistance.</p>
+        <a href="{{ url_for('auth.login') }}" class="btn-help">
+            <i class="bi bi-building"></i>HR Login
+            <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<script>
+    // Create floating particles
+    document.addEventListener('DOMContentLoaded', function() {
+        const particlesContainer = document.getElementById('particles');
+        if (particlesContainer) {
+            const particleCount = 40;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particle.style.animationDelay = (Math.random() * 10) + 's';
+                particle.style.width = (Math.random() * 4 + 2) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.opacity = Math.random() * 0.4 + 0.1;
+                particlesContainer.appendChild(particle);
+            }
+        }
+    });
+</script>
+{% endblock %}

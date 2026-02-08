@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Job - JobVibe AI HR Portal{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.2);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{{ url_for('company.jobs') }}" class="text-muted">Jobs</a></li>
+                <li class="breadcrumb-item active text-white">Edit</li>
+            </ol>
+        </nav>
+        <h1 class="text-white fw-bold mb-1">✏️ Edit Job</h1>
+        <p class="text-muted mb-0">{{ job.title }}</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Main Form -->
+        <div class="col-lg-8">
+            <form method="POST" action="{{ url_for('company.edit_job', job_id=job.job_id) }}" id="jobForm">
+                
+                <!-- Section 1: Basic Information -->
+                <div class="glass-card mb-4">
+                    <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                        <h5 class="mb-0 fw-semibold text-white">
+                            <span class="me-2">📋</span>Basic Information
+                        </h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" name="title" 
+                                   value="{{ job.title }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Job Overview</label>
+                            <textarea class="form-control" name="overview" rows="3">{{ job.overview or '' }}</textarea>
+                            <div class="form-text">A short summary that appears at the top of the job listing</div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Job Type <span class="text-danger">*</span></label>
+                                <select class="form-select" name="job_type" required>
+                                    <option value="Full-time" {{ 'selected' if job.job_type == 'Full-time' }}>Full-time</option>
+                                    <option value="Part-time" {{ 'selected' if job.job_type == 'Part-time' }}>Part-time</option>
+                                    <option value="Contract" {{ 'selected' if job.job_type == 'Contract' }}>Contract</option>
+                                    <option value="Internship" {{ 'selected' if job.job_type == 'Internship' }}>Internship</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Work Mode</label>
+                                <select class="form-select" name="work_mode">
+                                    <option value="Onsite" {{ 'selected' if job.work_mode == 'Onsite' }}>Onsite</option>
+                                    <option value="Remote" {{ 'selected' if job.work_mode == 'Remote' }}>Remote</option>
+                                    <option value="Hybrid" {{ 'selected' if job.work_mode == 'Hybrid' }}>Hybrid</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2: Location & Schedule -->
+                <div class="glass-card mb-4">
+                    <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                        <h5 class="mb-0 fw-semibold text-white">
+                            <span class="me-2">📍</span>Location & Schedule
+                        </h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Location <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="location" 
+                                       value="{{ job.location or '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Working Days</label>
+                                <input type="text" class="form-control" name="working_days" 
+                                       value="{{ job.working_days or '' }}" placeholder="e.g., Monday to Friday">
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Working Hours</label>
+                            <input type="text" class="form-control" name="working_hours" 
+                                   value="{{ job.working_hours or '' }}" placeholder="e.g., 9:00 AM - 6:00 PM">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 3: Salary & Experience -->
+                <div class="glass-card mb-4">
+                    <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                        <h5 class="mb-0 fw-semibold text-white">
+                            <span class="me-2">💰</span>Compensation & Experience
+                        </h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Currency</label>
+                                <select class="form-select" name="salary_currency">
+                                    <option value="PKR" {{ 'selected' if job.salary_currency == 'PKR' }}>PKR (Pakistani Rupee)</option>
+                                    <option value="USD" {{ 'selected' if job.salary_currency == 'USD' }}>USD (US Dollar)</option>
+                                    <option value="EUR" {{ 'selected' if job.salary_currency == 'EUR' }}>EUR (Euro)</option>
+                                    <option value="GBP" {{ 'selected' if job.salary_currency == 'GBP' }}>GBP (British Pound)</option>
+                                    <option value="AED" {{ 'selected' if job.salary_currency == 'AED' }}>AED (UAE Dirham)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Min Salary</label>
+                                <input type="number" class="form-control" name="salary_min" 
+                                       value="{{ job.salary_min or '' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Max Salary</label>
+                                <input type="number" class="form-control" name="salary_max" 
+                                       value="{{ job.salary_max or '' }}">
+                            </div>
+                        </div>
+                        <div class="form-text mb-3">💡 Per month salary. Leave blank if negotiable.</div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Experience Required</label>
+                                <select class="form-select" name="experience_required">
+                                    <option value="">Select Experience</option>
+                                    <option value="Fresh/Entry Level" {{ 'selected' if job.experience_required == 'Fresh/Entry Level' }}>Fresh / Entry Level</option>
+                                    <option value="1-2 years" {{ 'selected' if job.experience_required == '1-2 years' }}>1-2 years</option>
+                                    <option value="2-3 years" {{ 'selected' if job.experience_required == '2-3 years' }}>2-3 years</option>
+                                    <option value="3-5 years" {{ 'selected' if job.experience_required == '3-5 years' }}>3-5 years</option>
+                                    <option value="5-7 years" {{ 'selected' if job.experience_required == '5-7 years' }}>5-7 years</option>
+                                    <option value="7-10 years" {{ 'selected' if job.experience_required == '7-10 years' }}>7-10 years</option>
+                                    <option value="10+ years" {{ 'selected' if job.experience_required == '10+ years' }}>10+ years</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Education Required</label>
+                                <input type="text" class="form-control" name="education_required" 
+                                       value="{{ job.education_required or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 4: Job Description -->
+                <div class="glass-card mb-4">
+                    <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                        <h5 class="mb-0 fw-semibold text-white">
+                            <span class="me-2">📝</span>Job Description
+                        </h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Key Responsibilities <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="responsibilities" rows="6" required>{{ job.responsibilities or '' }}</textarea>
+                            <div class="form-text">Use bullet points (•) or dashes (-) for better readability</div>
+                        </div>
+                        
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Full Description</label>
+                            <textarea class="form-control" name="description" rows="4">{{ job.description or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 5: Requirements -->
+                <div class="glass-card mb-4">
+                    <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                        <h5 class="mb-0 fw-semibold text-white">
+                            <span class="me-2">✅</span>Requirements & Qualifications
+                        </h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Required Skills & Qualifications <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="requirements" rows="6" required>{{ job.requirements }}</textarea>
+                            <div class="form-text">🤖 <strong>Important:</strong> AI will use these to screen candidates</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Preferred Qualifications</label>
+                            <textarea class="form-control" name="preferred_qualifications" rows="4">{{ job.preferred_qualifications or '' }}</textarea>
+                            <div class="form-text">Bonus skills that would be great but not required</div>
+                        </div>
+                        
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Key Skills (Tags)</label>
+                            <input type="text" class="form-control" name="skills_required" 
+                                   value="{{ job.skills_required or '' }}">
+                            <div class="form-text">Comma-separated list of skills for filtering and matching</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 6: Settings -->
+                <div class="glass-card mb-4">
+                    <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                        <h5 class="mb-0 fw-semibold text-white">
+                            <span class="me-2">⚙️</span>Settings
+                        </h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Application Deadline</label>
+                                <input type="date" class="form-control" name="deadline"
+                                       value="{{ job.deadline.strftime('%Y-%m-%d') if job.deadline else '' }}">
+                                <div class="form-text">Leave blank for no deadline</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Status</label>
+                                <select class="form-select" name="is_active">
+                                    <option value="1" {{ 'selected' if job.is_active }}>Active - Accepting Applications</option>
+                                    <option value="0" {{ 'selected' if not job.is_active }}>Inactive - Not Accepting</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="d-flex justify-content-between mb-5">
+                    <a href="{{ url_for('company.jobs') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-arrow-left me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-check-lg me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar Info -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Job Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="text-muted small">Total Applications</span>
+                        <h3 class="mb-0 text-primary">{{ job.application_count }}</h3>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <span class="text-muted small">Posted On</span>
+                        <p class="mb-0 fw-semibold">{{ job.created_at.strftime('%d %b %Y') }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-0">
+                        <span class="text-muted small">Last Updated</span>
+                        <p class="mb-0 fw-semibold">{{ job.updated_at.strftime('%d %b %Y') if job.updated_at else 'Never' }}</p>
+                    </div>
+                </div>
+                {% if job.application_count > 0 %}
+                <div class="p-4 border-top" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <a href="{{ url_for('company.view_applications', job_id=job.job_id) }}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-people me-2"></i>View Applications
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

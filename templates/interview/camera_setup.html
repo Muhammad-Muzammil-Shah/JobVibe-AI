@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+
+{% block title %}Camera Setup - JobVibe AI{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    * {
+        font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%) !important;
+        min-height: 100vh;
+    }
+    
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .navbar, footer {
+        display: none !important;
+    }
+    
+    .setup-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 48px 24px;
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* Header */
+    .setup-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .brand-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.1));
+        padding: 10px 24px;
+        border-radius: 100px;
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        margin-bottom: 24px;
+    }
+    
+    .brand-badge span {
+        color: #a5b4fc;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .setup-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #67e8f9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .setup-subtitle {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.05rem;
+    }
+    
+    /* Main Card */
+    .setup-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        padding: 32px;
+        margin-bottom: 28px;
+    }
+    
+    /* Video Container */
+    .video-container {
+        aspect-ratio: 16/9;
+        background: linear-gradient(135deg, #1a1a2e, #0f0f23);
+        border-radius: 16px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 24px;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .video-container::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 16px;
+        padding: 2px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(6, 182, 212, 0.4));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+    
+    #previewVideo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+    }
+    
+    .video-overlay {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        padding: 8px 16px;
+        border-radius: 100px;
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .video-overlay .dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    /* Permission Status */
+    .permission-status {
+        margin-bottom: 24px;
+    }
+    
+    .status-box {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    
+    .status-box i {
+        font-size: 1.5rem;
+    }
+    
+    .status-box.checking {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #a5b4fc;
+    }
+    
+    .status-box.success {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #34d399;
+    }
+    
+    .status-box.error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+    }
+    
+    .status-box .status-text strong {
+        display: block;
+        margin-bottom: 4px;
+    }
+    
+    .status-box .status-text p {
+        margin: 0;
+        font-size: 0.85rem;
+        opacity: 0.8;
+        font-weight: 400;
+    }
+    
+    /* Checklist */
+    .checklist-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+    
+    .checklist-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    
+    .checklist-title i {
+        color: #10b981;
+    }
+    
+    .checklist-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+    }
+    
+    .checklist-item i {
+        color: #10b981;
+        font-size: 1rem;
+    }
+    
+    /* Buttons */
+    .button-group {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+    }
+    
+    .btn-action {
+        padding: 16px 32px;
+        border-radius: 100px;
+        font-weight: 600;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .btn-back {
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+    
+    .btn-start {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-start:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+        color: white;
+    }
+    
+    .btn-start:disabled {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.3);
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    @media (max-width: 768px) {
+        .checklist-grid {
+            grid-template-columns: 1fr;
+        }
+        .button-group {
+            flex-direction: column;
+        }
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-header">
+        <div class="brand-badge">
+            <i class="bi bi-camera-video" style="color: #a5b4fc;"></i>
+            <span>Camera Setup</span>
+        </div>
+        <h1 class="setup-title">Check Your Camera</h1>
+        <p class="setup-subtitle">Make sure you look good before starting the interview</p>
+    </div>
+    
+    <div class="setup-card">
+        <!-- Video Preview -->
+        <div class="video-container">
+            <video id="previewVideo" autoplay muted playsinline></video>
+            <div class="video-overlay">
+                <span class="dot"></span>
+                Preview Mode
+            </div>
+        </div>
+        
+        <!-- Permission Status -->
+        <div id="permissionStatus" class="permission-status">
+            <div class="status-box checking">
+                <i class="bi bi-arrow-repeat"></i>
+                <div class="status-text">
+                    <strong>Checking permissions...</strong>
+                    <p>Accessing camera and microphone</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Checklist -->
+        <div class="checklist-card">
+            <div class="checklist-title">
+                <i class="bi bi-check2-square"></i>
+                <span>Quick Checklist</span>
+            </div>
+            <div class="checklist-grid">
+                <div class="checklist-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Good lighting on your face</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Quiet environment</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Professional background</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Face clearly visible</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="button-group">
+            <a href="{{ url_for('interview.start_interview', interview_id=interview.interview_id) }}" class="btn-action btn-back">
+                <i class="bi bi-arrow-left"></i>
+                Back
+            </a>
+            <a href="{{ url_for('interview.room', interview_id=interview.interview_id) }}" id="startInterviewBtn" class="btn-action btn-start" style="pointer-events: none; opacity: 0.5;">
+                <i class="bi bi-play-circle"></i>
+                Start Recording
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const previewVideo = document.getElementById('previewVideo');
+    const permissionStatus = document.getElementById('permissionStatus');
+    const startBtn = document.getElementById('startInterviewBtn');
+    
+    async function initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { width: 1280, height: 720, facingMode: 'user' },
+                audio: true 
+            });
+            
+            previewVideo.srcObject = stream;
+            
+            permissionStatus.innerHTML = `
+                <div class="status-box success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <div class="status-text">
+                        <strong>Camera and microphone are ready!</strong>
+                        <p>You can see yourself in the preview above. Click "Start Recording" when ready.</p>
+                    </div>
+                </div>
+            `;
+            
+            startBtn.style.pointerEvents = 'auto';
+            startBtn.style.opacity = '1';
+            
+        } catch (err) {
+            console.error('Camera error:', err);
+            
+            let errorMessage = 'Unable to access camera and microphone.';
+            if (err.name === 'NotAllowedError') {
+                errorMessage = 'Camera/microphone access was denied. Please allow access and refresh the page.';
+            } else if (err.name === 'NotFoundError') {
+                errorMessage = 'No camera or microphone found. Please connect a device and refresh.';
+            } else if (err.name === 'NotReadableError') {
+                errorMessage = 'Camera is in use by another application. Please close it and refresh.';
+            }
+            
+            permissionStatus.innerHTML = `
+                <div class="status-box error">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <div class="status-text">
+                        <strong>Permission Error</strong>
+                        <p>${errorMessage}</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    initCamera();
+</script>
+{% endblock %}

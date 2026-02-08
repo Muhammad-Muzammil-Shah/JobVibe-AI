@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Environment files (KEEP SECRETS OUT OF GIT)
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+
+# Database files (local only)
+instance/
+*.db
+*.sqlite3
+
+# Uploads (local only - Azure uses Blob Storage or /home/site)
+uploads/resumes/*
+uploads/videos/*
+!uploads/resumes/.gitkeep
+!uploads/videos/.gitkeep
+
+# ML Models (too large for git)
+emotion_model.h5
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Azure
+.azure/
+
+# Logs
+*.log

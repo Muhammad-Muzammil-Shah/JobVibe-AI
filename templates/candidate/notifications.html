@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - JobVibe AI{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: rgba(6, 182, 212, 0.1); border-bottom: 1px solid rgba(6, 182, 212, 0.2);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="text-white fw-bold mb-1">🔔 Notifications</h1>
+                <p class="text-muted mb-0">Stay updated on your applications</p>
+            </div>
+            <form method="POST" action="{{ url_for('candidate.mark_all_notifications_read') }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check2-all me-2"></i>Mark All Read
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    {% if notifications %}
+    <div class="glass-card">
+        <div class="p-0">
+            {% for notif in notifications %}
+            <div class="d-flex align-items-start p-4 {% if not loop.last %}border-bottom{% endif %}" style="{% if not notif.is_read %}background: rgba(99, 102, 241, 0.05);{% endif %} border-color: rgba(255,255,255,0.05) !important;">
+                <div class="me-3">
+                    {% if notif.notification_type == 'interview_invite' %}
+                    <span class="d-flex align-items-center justify-content-center rounded-circle" 
+                          style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.2);">
+                        <span style="font-size: 1.5rem;">🎉</span>
+                    </span>
+                    {% elif notif.notification_type == 'status_update' %}
+                    <span class="d-flex align-items-center justify-content-center rounded-circle" 
+                          style="width: 50px; height: 50px; background: rgba(6, 182, 212, 0.2);">
+                        <span style="font-size: 1.5rem;">📋</span>
+                    </span>
+                    {% elif notif.notification_type == 'reminder' %}
+                    <span class="d-flex align-items-center justify-content-center rounded-circle" 
+                          style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.2);">
+                        <span style="font-size: 1.5rem;">⏰</span>
+                    </span>
+                    {% else %}
+                    <span class="d-flex align-items-center justify-content-center rounded-circle" 
+                          style="width: 50px; height: 50px; background: rgba(99, 102, 241, 0.2);">
+                        <span style="font-size: 1.5rem;">📢</span>
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0 fw-semibold text-white">
+                            {{ notif.title }}
+                            {% if not notif.is_read %}
+                            <span class="badge bg-primary ms-2">New</span>
+                            {% endif %}
+                        </h6>
+                        <small class="text-muted">{{ notif.created_at.strftime('%b %d, %Y %H:%M') }}</small>
+                    </div>
+                    <p class="text-muted mb-2">{{ notif.message }}</p>
+                    
+                    {% if notif.notification_type == 'interview_invite' %}
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <span class="badge bg-success px-3 py-2">
+                            Interview ID: <strong>{{ notif.interview_code }}</strong>
+                        </span>
+                        {% if notif.expires_at %}
+                        <span class="{% if notif.is_expired %}text-danger{% else %}text-muted{% endif %}">
+                            {% if notif.is_expired %}
+                            ❌ Expired
+                            {% else %}
+                            ⏰ {{ notif.days_remaining }} days remaining
+                            {% endif %}
+                        </span>
+                        {% endif %}
+                        {% if not notif.is_expired %}
+                        <a href="{{ url_for('interview.verify_otp') }}" class="btn btn-success btn-sm">
+                            🎥 Take Interview
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="glass-card">
+        <div class="p-5 text-center">
+            <i class="bi bi-bell-slash display-1 text-muted mb-3"></i>
+            <h4 class="text-white">No Notifications</h4>
+            <p class="text-muted mb-0">You don't have any notifications yet. Apply for jobs to receive updates!</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

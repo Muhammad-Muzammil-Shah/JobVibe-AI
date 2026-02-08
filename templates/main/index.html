@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}JobVibe AI - HR Portal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 hero-section" style="min-height: 70vh;">
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-white py-5">
+                <span class="badge bg-white bg-opacity-10 text-white mb-3 px-3 py-2 rounded-pill">
+                    <i class="bi bi-stars me-1"></i> AI-Powered Recruitment
+                </span>
+                <h1 class="display-3 fw-bold mb-4">
+                    Smart Hiring <br>
+                    <span class="gradient-text">Made Simple</span>
+                </h1>
+                <p class="lead mb-4" style="color: rgba(255,255,255,0.8);">
+                    Streamline your hiring process with intelligent resume screening, 
+                    automated video interviews, and AI-driven candidate analysis.
+                </p>
+                {% if not current_user.is_authenticated %}
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('main.main_jobs') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-search me-2"></i>Find Jobs
+                    </a>
+                    <a href="{{ url_for('auth.company_register') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-building-add me-2"></i>Post Jobs
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <small style="color: rgba(255,255,255,0.6);">Are you an HR Manager?</small> 
+                    <a href="{{ url_for('auth.company_login') }}" class="text-white text-decoration-underline ms-1">Login here</a>
+                </div>
+                {% else %}
+                <a href="{{ url_for('company.company_dashboard') }}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+                </a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6 text-center d-none d-lg-block">
+                <div class="glass-card p-5" style="background: rgba(99, 102, 241, 0.1);">
+                    <div style="font-size: 12rem; filter: drop-shadow(0 20px 40px rgba(99, 102, 241, 0.3));">🚀</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="glass-card p-4">
+                    <h2 class="display-4 fw-bold gradient-text">{{ stats.total_jobs }}</h2>
+                    <p class="text-muted mb-0">Active Job Postings</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card p-4">
+                    <h2 class="display-4 fw-bold" style="color: #10b981;">{{ stats.total_companies }}</h2>
+                    <p class="text-muted mb-0">Companies Registered</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card p-4">
+                    <h2 class="display-4 fw-bold" style="color: #06b6d4;">{{ stats.total_candidates }}</h2>
+                    <p class="text-muted mb-0">Candidates Processed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2 rounded-pill">Features</span>
+            <h2 class="display-5 fw-bold text-white">Why JobVibe AI?</h2>
+            <p class="lead text-muted">Transform your hiring process with cutting-edge AI</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 glass-card">
+                    <div class="feature-icon mx-auto" style="width: 80px; height: 80px; font-size: 2.5rem; background: rgba(99, 102, 241, 0.15); border-radius: 20px; display: flex; align-items: center; justify-content: center;">📝</div>
+                    <h4 class="mt-4 text-white">Smart Job Posting</h4>
+                    <p class="text-muted">
+                        Create detailed job listings with AI-suggested requirements 
+                        and attract the right candidates automatically.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 glass-card">
+                    <div class="feature-icon mx-auto" style="width: 80px; height: 80px; font-size: 2.5rem; background: rgba(6, 182, 212, 0.15); border-radius: 20px; display: flex; align-items: center; justify-content: center;">🤖</div>
+                    <h4 class="mt-4 text-white">AI Resume Screening</h4>
+                    <p class="text-muted">
+                        Automatically analyze and score resumes based on job requirements.
+                        Save hours of manual screening time.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 glass-card">
+                    <div class="feature-icon mx-auto" style="width: 80px; height: 80px; font-size: 2.5rem; background: rgba(16, 185, 129, 0.15); border-radius: 20px; display: flex; align-items: center; justify-content: center;">🎥</div>
+                    <h4 class="mt-4 text-white">Video Interviews</h4>
+                    <p class="text-muted">
+                        Conduct automated video interviews with AI proctoring, 
+                        emotion analysis, and transcript generation.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 glass-card">
+                    <div class="feature-icon mx-auto" style="width: 80px; height: 80px; font-size: 2.5rem; background: rgba(245, 158, 11, 0.15); border-radius: 20px; display: flex; align-items: center; justify-content: center;">📊</div>
+                    <h4 class="mt-4 text-white">Analytics Dashboard</h4>
+                    <p class="text-muted">
+                        Get insights on your hiring pipeline, candidate quality,
+                        and recruitment performance metrics.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 glass-card">
+                    <div class="feature-icon mx-auto" style="width: 80px; height: 80px; font-size: 2.5rem; background: rgba(239, 68, 68, 0.15); border-radius: 20px; display: flex; align-items: center; justify-content: center;">🔒</div>
+                    <h4 class="mt-4 text-white">Anti-Cheating System</h4>
+                    <p class="text-muted">
+                        Fullscreen enforcement, tab-switch detection, and 
+                        real-time monitoring ensure interview integrity.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 glass-card">
+                    <div class="feature-icon mx-auto" style="width: 80px; height: 80px; font-size: 2.5rem; background: rgba(139, 92, 246, 0.15); border-radius: 20px; display: flex; align-items: center; justify-content: center;">🌐</div>
+                    <h4 class="mt-4 text-white">Instant Access</h4>
+                    <p class="text-muted">
+                        Secure interview access with unique Interview IDs.
+                        Candidates join without creating accounts.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Interview Section for Candidates -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2 rounded-pill">For Interview Candidates</span>
+                <h2 class="display-5 fw-bold text-white">Ready for your Interview?</h2>
+                <p class="lead text-muted mb-4">
+                    If you've received an interview invitation with an Interview ID, 
+                    you can start your video interview directly from here.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('interview.verify_otp') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-play-circle me-2"></i>Start Interview
+                    </a>
+                    <a href="{{ url_for('main.main_jobs') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-search me-2"></i>Browse Open Jobs
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                <div class="glass-card p-4 mx-auto" style="max-width: 380px;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🎬</div>
+                    <h5 class="text-white mt-3">Interview Process</h5>
+                    <ol class="text-start text-muted small mb-0 ps-3">
+                        <li class="mb-2 py-1">Enter your Interview ID</li>
+                        <li class="mb-2 py-1">Allow camera & microphone access</li>
+                        <li class="mb-2 py-1">Complete the video interview</li>
+                        <li class="py-1">Receive results via email</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 text-center" style="background: rgba(99, 102, 241, 0.1); border-top: 1px solid rgba(99, 102, 241, 0.2); border-bottom: 1px solid rgba(99, 102, 241, 0.2);">
+    <div class="container">
+        <h2 class="display-5 fw-bold text-white mb-3">Ready to Transform Your Hiring?</h2>
+        <p class="lead mb-4 text-muted">
+            Join companies using AI to find the best talent faster.
+        </p>
+        <a href="{{ url_for('auth.company_register') }}" class="btn btn-primary btn-lg px-5">
+            <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+        </a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - JobVibe AI{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="glass-card p-5">
+                    <div style="font-size: 6rem;" class="mb-3">🔍</div>
+                    <h1 class="display-3 fw-bold gradient-text">404</h1>
+                    <h2 class="mb-3 fw-semibold text-white">Page Not Found</h2>
+                    <p class="text-muted mb-4">
+                        Oops! The page you're looking for doesn't exist or has been moved.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
+                            🏠 Go Home
+                        </a>
+                        <a href="{{ url_for('main.main_jobs') }}" class="btn btn-outline-light btn-lg">
+                            💼 Browse Jobs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

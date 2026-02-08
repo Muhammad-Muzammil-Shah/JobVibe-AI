@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - JobVibe AI{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: rgba(6, 182, 212, 0.1); border-bottom: 1px solid rgba(6, 182, 212, 0.2);">
+    <div class="container">
+        <h1 class="text-white fw-bold mb-1">👤 My Profile</h1>
+        <p class="text-muted mb-0">Manage your personal information</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <!-- Profile Card -->
+            <div class="glass-card">
+                <div class="text-center py-4 px-4">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-3" 
+                         style="width: 100px; height: 100px; background: linear-gradient(135deg, #06b6d4, #10b981); color: #fff; font-size: 2.5rem; font-weight: 600; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);">
+                        {{ candidate.full_name[0] if candidate.full_name else 'U' }}
+                    </div>
+                    <h4 class="fw-semibold text-white">{{ candidate.full_name or 'Your Name' }}</h4>
+                    <p class="text-muted mb-3">{{ current_user.email }}</p>
+                    
+                    {% if candidate.default_resume_path %}
+                    <a href="{{ candidate.default_resume_path }}" target="_blank" class="btn btn-sm" style="background: rgba(6, 182, 212, 0.2); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">
+                        📄 View Resume
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="py-3 px-4" style="background: rgba(255, 255, 255, 0.03); border-top: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h5 class="mb-0 fw-bold gradient-text">{{ candidate.applications.count() }}</h5>
+                            <small class="text-muted">Applications</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="mb-0 fw-bold" style="color: #10b981;">{{ candidate.experience_years or 0 }}</h5>
+                            <small class="text-muted">Years Exp</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="mb-0 fw-bold" style="color: #06b6d4;">{{ candidate.skills.split(',') | length if candidate.skills else 0 }}</h5>
+                            <small class="text-muted">Skills</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="glass-card mt-4">
+                <div class="p-3 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h6 class="mb-0 fw-semibold text-white">🔗 Quick Links</h6>
+                </div>
+                <div class="p-3">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <a href="{{ url_for('candidate.candidate_dashboard') }}" class="text-decoration-none d-flex align-items-center py-2 px-3 rounded" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc;">
+                                <span class="me-2">📊</span>Dashboard
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('main.main_jobs') }}" class="text-decoration-none d-flex align-items-center py-2 px-3 rounded" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                                <span class="me-2">🔍</span>Browse Jobs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('interview.verify_otp') }}" class="text-decoration-none d-flex align-items-center py-2 px-3 rounded" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                                <span class="me-2">🎥</span>Take Interview
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="glass-card">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 fw-semibold text-white"><span class="me-2">✏️</span>Edit Profile</h5>
+                </div>
+                <div class="p-4">
+                    <form method="POST" action="{{ url_for('candidate.profile') }}" enctype="multipart/form-data">
+                        <!-- Basic Info -->
+                        <h6 class="mb-3 fw-semibold" style="color: rgba(255, 255, 255, 0.7);">📋 Basic Information</h6>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="full_name" 
+                                       value="{{ candidate.full_name or '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Phone Number</label>
+                                <input type="tel" class="form-control" name="phone" 
+                                       value="{{ candidate.phone or '' }}" placeholder="+1 (555) 123-4567">
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">LinkedIn Profile</label>
+                                <input type="url" class="form-control" name="linkedin_url" 
+                                       value="{{ candidate.linkedin_url or '' }}" placeholder="https://linkedin.com/in/yourprofile">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Portfolio Website</label>
+                                <input type="url" class="form-control" name="portfolio_url" 
+                                       value="{{ candidate.portfolio_url or '' }}" placeholder="https://yourportfolio.com">
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Professional Info -->
+                        <h6 class="mb-3" style="color: rgba(255, 255, 255, 0.7);">💼 Professional Information</h6>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">Years of Experience</label>
+                                <input type="number" class="form-control" name="experience_years" 
+                                       value="{{ candidate.experience_years or 0 }}" min="0" max="50">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Education</label>
+                                <input type="text" class="form-control" name="education" 
+                                       value="{{ candidate.education or '' }}" 
+                                       placeholder="e.g., Bachelor's in Computer Science, MIT">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Skills</label>
+                            <input type="text" class="form-control" name="skills" 
+                                   value="{{ candidate.skills or '' }}" 
+                                   placeholder="Python, JavaScript, React, AWS (comma-separated)">
+                            <div class="form-text">Separate skills with commas</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Professional Summary</label>
+                            <textarea class="form-control" name="bio" rows="4" 
+                                      placeholder="Write a brief summary about yourself...">{{ candidate.bio or '' }}</textarea>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Resume Upload -->
+                        <h6 class="mb-3" style="color: rgba(255, 255, 255, 0.7);">📄 Resume</h6>
+                        
+                        <div class="mb-4">
+                            {% if candidate.default_resume_path %}
+                            <div class="d-flex align-items-center mb-3 p-3 rounded" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2);">
+                                <i class="bi bi-file-earmark-pdf fs-4 me-2" style="color: #06b6d4;"></i>
+                                <div class="flex-grow-1">
+                                    <strong class="text-white">Current Resume:</strong> 
+                                    <a href="{{ candidate.default_resume_path }}" target="_blank" style="color: #06b6d4;">View</a>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <label class="form-label">Upload New Resume</label>
+                            <input type="file" class="form-control" name="resume" accept=".pdf,.doc,.docx">
+                            <div class="form-text">Accepted formats: PDF, DOC, DOCX (Max 10MB)</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-lg me-2"></i>Save Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

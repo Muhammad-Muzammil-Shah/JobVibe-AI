@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Company Registration - JobVibe AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="glass-card" style="overflow: hidden;">
+                <!-- Header with gradient -->
+                <div class="text-center py-4" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));">
+                    <div style="font-size: 3rem;">🏢</div>
+                    <h2 class="text-white mb-0 mt-2">Company Registration</h2>
+                    <p class="text-muted mb-0">Create your HR account to hire talent</p>
+                </div>
+                
+                <div class="p-4">
+                    <form method="POST" action="{{ url_for('auth.company_register') }}">
+                        <!-- Hidden Role - Always Company -->
+                        <input type="hidden" name="role" value="Company">
+                        
+                        <!-- Company Name -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="company_name" 
+                                   placeholder="Your Company Name" required>
+                        </div>
+                        
+                        <!-- Industry -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Industry <span class="text-danger">*</span></label>
+                            <select class="form-select" name="industry" required>
+                                <option value="">Select Industry</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Software">Software Development</option>
+                                <option value="Finance">Finance & Banking</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Education">Education</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Retail">Retail & E-commerce</option>
+                                <option value="Media">Media & Entertainment</option>
+                                <option value="Consulting">Consulting</option>
+                                <option value="Telecom">Telecommunications</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">HR Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="email" 
+                                   placeholder="hr@yourcompany.com" required>
+                        </div>
+                        
+                        <!-- Password -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" name="password" 
+                                       placeholder="Min. 8 characters" minlength="8" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" name="confirm_password" 
+                                       placeholder="Re-enter password" minlength="8" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Features Info -->
+                        <div class="alert mb-4" style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: #a5b4fc;">
+                            <h6 class="mb-2"><i class="bi bi-info-circle me-2"></i>Benefits for Companies:</h6>
+                            <ul class="mb-0 small">
+                                <li>📝 Unlimited Job Postings</li>
+                                <li>🤖 AI Resume Ranking</li>
+                                <li>🎥 Automated Video Interviews</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Terms -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label small text-muted" for="terms">
+                                    I agree to the <a href="#" class="text-decoration-none" style="color: #a5b4fc;">Terms of Service</a>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                            <i class="bi bi-building-add me-2"></i>Create Account
+                        </button>
+                        
+                        <p class="text-center text-muted mb-0 small">
+                            Already have an account? 
+                            <a href="{{ url_for('auth.company_login') }}" class="fw-semibold" style="color: #a5b4fc;">Sign in</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+# Azure App Service deployment exclusion patterns
+# These files/folders will NOT be uploaded to Azure
+
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+instance/
+.git/
+.vscode/
+.env
+.env.local
+*.db
+*.sqlite3
+emotion_model.h5
+uploads/resumes/*
+uploads/videos/*
+node_modules/
+*.log
+.azure/

@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+
+{% block title %}Application Details - JobVibe AI{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.2);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{{ url_for('company.company_dashboard') }}" class="text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('company.job_applications', job_id=application.job.job_id) }}" class="text-muted">{{ application.job.title }}</a></li>
+                <li class="breadcrumb-item active text-white">{{ application.candidate.full_name }}</li>
+            </ol>
+        </nav>
+        <h1 class="text-white fw-bold mb-1">👤 {{ application.candidate.full_name }}</h1>
+        <p class="text-muted mb-0">Application for {{ application.job.title }}</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Candidate Info -->
+            <div class="glass-card mb-4">
+                <div class="p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle me-3" 
+                             style="width: 70px; height: 70px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; font-size: 1.8rem; font-weight: 600;">
+                            {{ application.candidate.full_name[0] }}
+                        </div>
+                        <div class="flex-grow-1">
+                            <h3 class="mb-1 fw-semibold text-white">{{ application.candidate.full_name }}</h3>
+                            <p class="text-muted mb-0">{{ application.candidate.user.email }}</p>
+                        </div>
+                        <span class="badge fs-5" style="background: {% if application.status == 'Applied' %}rgba(99, 102, 241, 0.2); color: #a5b4fc;{% elif application.status == 'Screening' %}rgba(6, 182, 212, 0.2); color: #06b6d4;{% elif application.status == 'Shortlisted' %}rgba(16, 185, 129, 0.2); color: #10b981;{% elif application.status == 'Interview' %}rgba(245, 158, 11, 0.2); color: #f59e0b;{% elif application.status == 'Rejected' %}rgba(239, 68, 68, 0.2); color: #ef4444;{% else %}rgba(16, 185, 129, 0.2); color: #10b981;{% endif %}">
+                            {{ application.status }}
+                        </span>
+                    </div>
+                    
+                    <div class="row">
+                        {% if application.candidate.phone %}
+                        <div class="col-md-4 mb-2 text-muted">
+                            📞 {{ application.candidate.phone }}
+                        </div>
+                        {% endif %}
+                        {% if application.candidate.linkedin_url %}
+                        <div class="col-md-4 mb-2">
+                            <a href="{{ application.candidate.linkedin_url }}" target="_blank" style="color: #a5b4fc;">
+                                🔗 LinkedIn
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% if application.candidate.portfolio_url %}
+                        <div class="col-md-4 mb-2">
+                            <a href="{{ application.candidate.portfolio_url }}" target="_blank" style="color: #a5b4fc;">
+                                🌐 Portfolio
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Resume Analysis -->
+            <div class="glass-card mb-4">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 fw-semibold text-white"><span class="me-2">🤖</span>AI Resume Analysis</h5>
+                </div>
+                <div class="p-4">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="display-4 fw-bold" style="color: {% if application.ai_resume_score >= 70 %}#10b981{% elif application.ai_resume_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
+                                {{ application.ai_resume_score|round(1) }}%
+                            </div>
+                            <p class="text-muted mb-0">Resume Match Score</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="progress mb-2" style="height: 20px; border-radius: 10px; background: rgba(255,255,255,0.1);">
+                                <div class="progress-bar" style="width: {{ application.ai_resume_score }}%; background: {% if application.ai_resume_score >= 70 %}#10b981{% elif application.ai_resume_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                {% if application.ai_resume_score >= 70 %}
+                                <i class="bi bi-check-circle text-success me-1"></i>Strong match - Recommended for interview
+                                {% elif application.ai_resume_score >= 50 %}
+                                <i class="bi bi-exclamation-circle text-warning me-1"></i>Moderate match - Review recommended
+                                {% else %}
+                                <i class="bi bi-x-circle text-danger me-1"></i>Weak match - May not meet requirements
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    {% if application.resume_analysis %}
+                    {% set analysis = application.resume_analysis | fromjson if application.resume_analysis else {} %}
+                    
+                    <h6>Skills Found</h6>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% for skill in analysis.get('skills_found', []) %}
+                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ skill }}</span>
+                        {% else %}
+                        <span class="text-muted">No skills extracted</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Experience:</strong> {{ analysis.get('experience_years', 0) }} years</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Education:</strong> {{ ', '.join(analysis.get('education', [])) or 'Not specified' }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <hr class="my-3">
+                    
+                    <a href="{{ application.resume_path }}" target="_blank" class="btn btn-outline-primary">
+                        <i class="bi bi-file-earmark-pdf me-2"></i>View Resume
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Interview Results (if available) -->
+            {% if result %}
+            <div class="glass-card mb-4">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 text-white"><i class="bi bi-graph-up me-2"></i>Interview Analysis - 4 Pillars</h5>
+                </div>
+                <div class="p-4">
+                    <!-- Overall Score with Percentile -->
+                    <div class="text-center mb-4">
+                        <div class="display-3 fw-bold" style="color: {% if result.overall_score >= 70 %}#10b981{% elif result.overall_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">{{ result.overall_score|round(1) }}%</div>
+                        <p class="text-muted mb-2">Overall Score</p>
+                        {% if result.overall_percentile %}
+                        <span class="badge fs-6 px-3 py-2" style="background: rgba(6, 182, 212, 0.2); color: #06b6d4;">
+                            📊 Top {{ (100 - result.overall_percentile)|round(0) }}% of all candidates
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- 4 Pillars -->
+                    <div class="row g-4">
+                        <!-- Pillar 1: Resume -->
+                        <div class="col-md-6">
+                            <div class="card" style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2);">
+                                <div class="p-4 text-center">
+                                    <i class="bi bi-file-earmark-text fs-1 mb-2" style="color: #a5b4fc;"></i>
+                                    <h6 class="text-white">Resume Match</h6>
+                                    <h3 style="color: #a5b4fc;">{{ result.resume_score|round(1) }}%</h3>
+                                    <div class="progress" style="height: 8px; background: rgba(255,255,255,0.1);">
+                                        <div class="progress-bar" style="width: {{ result.resume_score }}%; background: #6366f1;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pillar 2: Confidence -->
+                        <div class="col-md-6">
+                            <div class="card" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);">
+                                <div class="p-4 text-center">
+                                    <i class="bi bi-emoji-smile fs-1 mb-2" style="color: #10b981;"></i>
+                                    <h6 class="text-white">Confidence</h6>
+                                    <h3 style="color: #10b981;">{{ result.confidence_score|round(1) }}%</h3>
+                                    <div class="progress" style="height: 8px; background: rgba(255,255,255,0.1);">
+                                        <div class="progress-bar" style="width: {{ result.confidence_score }}%; background: #10b981;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pillar 3: Communication -->
+                        <div class="col-md-6">
+                            <div class="card" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2);">
+                                <div class="p-4 text-center">
+                                    <i class="bi bi-mic fs-1 mb-2" style="color: #06b6d4;"></i>
+                                    <h6 class="text-white">Communication</h6>
+                                    <h3 style="color: #06b6d4;">{{ result.communication_score|round(1) }}%</h3>
+                                    <div class="progress" style="height: 8px; background: rgba(255,255,255,0.1);">
+                                        <div class="progress-bar" style="width: {{ result.communication_score }}%; background: #06b6d4;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pillar 4: Knowledge -->
+                        <div class="col-md-6">
+                            <div class="card" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);">
+                                <div class="p-4 text-center">
+                                    <i class="bi bi-lightbulb fs-1 mb-2" style="color: #f59e0b;"></i>
+                                    <h6 class="text-white">Knowledge</h6>
+                                    <h3 style="color: #f59e0b;">{{ result.knowledge_score|round(1) }}%</h3>
+                                    <div class="progress" style="height: 8px; background: rgba(255,255,255,0.1);">
+                                        <div class="progress-bar" style="width: {{ result.knowledge_score }}%; background: #f59e0b;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Evaluation Summary -->
+                    <div class="mt-4 pt-4 border-top" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                        <h6 class="mb-3 text-white"><i class="bi bi-robot me-2"></i>AI Evaluation Summary</h6>
+                        <div class="card" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2);">
+                            <div class="p-4">
+                                {% if result.overall_score >= 80 %}
+                                <div class="d-flex align-items-start mb-3">
+                                    <span class="badge px-3 py-2 me-3" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">Strong Hire</span>
+                                    <p class="mb-0 text-muted">
+                                        {{ application.candidate.full_name }} demonstrated excellent performance across all evaluation criteria 
+                                        for the {{ application.job.title }} position. Strong technical knowledge combined with confident 
+                                        communication skills.
+                                    </p>
+                                </div>
+                                {% elif result.overall_score >= 70 %}
+                                <div class="d-flex align-items-start mb-3">
+                                    <span class="badge px-3 py-2 me-3" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">Hire</span>
+                                    <p class="mb-0 text-muted">
+                                        {{ application.candidate.full_name }} showed strong qualifications and performed well in the interview 
+                                        for {{ application.job.title }}. Meets most requirements with good potential.
+                                    </p>
+                                </div>
+                                {% elif result.overall_score >= 60 %}
+                                <div class="d-flex align-items-start mb-3">
+                                    <span class="badge px-3 py-2 me-3" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">Consider</span>
+                                    <p class="mb-0 text-muted">
+                                        {{ application.candidate.full_name }} met basic requirements for {{ application.job.title }} but may 
+                                        need additional evaluation or training in some areas.
+                                    </p>
+                                </div>
+                                {% else %}
+                                <div class="d-flex align-items-start mb-3">
+                                    <span class="badge px-3 py-2 me-3" style="background: rgba(156, 163, 175, 0.2); color: #9ca3af;">On Hold</span>
+                                    <p class="mb-0 text-muted">
+                                        {{ application.candidate.full_name }} showed potential but scored below expectations for the 
+                                        {{ application.job.title }} role. Further consideration recommended.
+                                    </p>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <h6 class="mb-2" style="color: #10b981;"><i class="bi bi-check-circle me-1"></i>Strengths</h6>
+                                        <ul class="list-unstyled small text-muted mb-0">
+                                            {% if result.resume_score >= 70 %}
+                                            <li>✓ Strong resume-job alignment</li>
+                                            {% endif %}
+                                            {% if result.confidence_score >= 70 %}
+                                            <li>✓ Good confidence and presence</li>
+                                            {% endif %}
+                                            {% if result.communication_score >= 70 %}
+                                            <li>✓ Clear communication skills</li>
+                                            {% endif %}
+                                            {% if result.knowledge_score >= 70 %}
+                                            <li>✓ Solid technical knowledge</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-2" style="color: #f59e0b;"><i class="bi bi-exclamation-circle me-1"></i>Areas to Probe</h6>
+                                        <ul class="list-unstyled small text-muted mb-0">
+                                            {% if result.resume_score < 60 %}
+                                            <li>⚠ Resume-job fit concerns</li>
+                                            {% endif %}
+                                            {% if result.confidence_score < 60 %}
+                                            <li>⚠ Low confidence during interview</li>
+                                            {% endif %}
+                                            {% if result.communication_score < 60 %}
+                                            <li>⚠ Communication needs improvement</li>
+                                            {% endif %}
+                                            {% if result.knowledge_score < 60 %}
+                                            <li>⚠ Technical knowledge gaps</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Cover Letter -->
+            {% if application.cover_letter %}
+            <div class="glass-card mb-4">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 text-white"><i class="bi bi-envelope-paper me-2"></i>Cover Letter</h5>
+                </div>
+                <div class="p-4">
+                    <p class="text-muted mb-0">{{ application.cover_letter }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- HR Decision -->
+            <div class="glass-card mb-4 sticky-top" style="top: 80px;">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 text-white"><i class="bi bi-clipboard-check me-2"></i>HR Decision</h5>
+                </div>
+                <div class="p-4">
+                    {% if result %}
+                    <form method="POST" action="{{ url_for('company.make_decision', app_id=application.app_id) }}">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Decision</label>
+                            <select class="form-select" name="decision" required>
+                                <option value="Pending" {{ 'selected' if result.hr_decision == 'Pending' }}>Pending Review</option>
+                                <option value="Selected" {{ 'selected' if result.hr_decision == 'Selected' }}>Select for Physical Interview</option>
+                                <option value="On-Hold" {{ 'selected' if result.hr_decision == 'On-Hold' }}>Put On Hold</option>
+                                <option value="Rejected" {{ 'selected' if result.hr_decision == 'Rejected' }}>Reject</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Notes</label>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="Add any notes about this candidate...">{{ result.hr_notes or '' }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-lg me-2"></i>Save Decision
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-hourglass-split display-4 text-muted"></i>
+                        <p class="text-muted mt-2 mb-0">
+                            {% if application.interview and not application.interview.is_completed %}
+                            Waiting for candidate to complete interview
+                            {% elif application.status == 'Shortlisted' %}
+                            Interview pending
+                            {% else %}
+                            No interview scheduled
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Interview Info -->
+            {% if application.interview %}
+            <div class="glass-card">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 text-white"><i class="bi bi-camera-video me-2"></i>Interview Details</h5>
+                </div>
+                <div class="p-4">
+                    <ul class="list-unstyled mb-0 text-muted">
+                        <li class="mb-2">
+                            <strong class="text-white">Interview ID:</strong> 
+                            <code class="ms-2 px-2 py-1 rounded" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">{{ application.interview.interview_code }}</code>
+                        </li>
+                        <li class="mb-2">
+                            <strong class="text-white">Status:</strong>
+                            {% if application.interview.is_completed %}
+                            <span class="badge ms-2" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">Completed</span>
+                            {% else %}
+                            <span class="badge ms-2" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">Pending</span>
+                            {% endif %}
+                        </li>
+                        {% if application.interview.expires_at %}
+                        <li class="mb-2">
+                            <strong class="text-white">Expires:</strong> {{ application.interview.expires_at.strftime('%b %d, %Y') }}
+                            {% if application.interview.is_expired %}
+                            <span class="badge ms-1" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Expired</span>
+                            {% endif %}
+                        </li>
+                        {% endif %}
+                        {% if application.interview.started_at %}
+                        <li class="mb-2">
+                            <strong class="text-white">Started:</strong> {{ application.interview.started_at.strftime('%b %d, %Y %H:%M') }}
+                        </li>
+                        {% endif %}
+                        {% if application.interview.completed_at %}
+                        <li class="mb-2">
+                            <strong class="text-white">Completed:</strong> {{ application.interview.completed_at.strftime('%b %d, %Y %H:%M') }}
+                        </li>
+                        {% endif %}
+                        <li>
+                            <strong class="text-white">Questions:</strong> {{ application.interview.questions.count() }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

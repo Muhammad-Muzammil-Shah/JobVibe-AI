@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Applications for {{ job.title }} - JobVibe AI{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.2);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{{ url_for('company.company_dashboard') }}"
+                        class="text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('company.jobs') }}" class="text-muted">Jobs</a></li>
+                <li class="breadcrumb-item active text-white">Applications</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="text-white fw-bold mb-1">👥 {{ job.title }}</h1>
+                <p class="text-muted mb-0">{{ job.application_count }} Applications</p>
+            </div>
+            <a href="{{ url_for('company.edit_job', job_id=job.job_id) }}" class="btn btn-primary">
+                ✏️ Edit Job
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Filters -->
+    <div class="glass-card mb-4">
+        <div class="p-3">
+            <style>
+                .filter-btn {
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    color: rgba(255, 255, 255, 0.7);
+                }
+
+                .filter-btn-applied {
+                    background: rgba(99, 102, 241, 0.2);
+                    color: #a5b4fc;
+                    border: none;
+                }
+
+                .filter-btn-screening {
+                    background: rgba(6, 182, 212, 0.2);
+                    color: #06b6d4;
+                    border: none;
+                }
+
+                .filter-btn-shortlisted {
+                    background: rgba(16, 185, 129, 0.2);
+                    color: #10b981;
+                    border: none;
+                }
+
+                .filter-btn-interview {
+                    background: rgba(245, 158, 11, 0.2);
+                    color: #f59e0b;
+                    border: none;
+                }
+
+                .filter-btn-hired {
+                    background: rgba(16, 185, 129, 0.2);
+                    color: #10b981;
+                    border: none;
+                }
+
+                .filter-btn-rejected {
+                    background: rgba(239, 68, 68, 0.2);
+                    color: #ef4444;
+                    border: none;
+                }
+            </style>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('company.job_applications', job_id=job.job_id) }}"
+                    class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-outline-light' }}">
+                    All
+                </a>
+                <a href="{{ url_for('company.job_applications', job_id=job.job_id, status='Applied') }}"
+                    class="btn btn-sm {{ 'filter-btn-applied' if status_filter == 'Applied' else 'filter-btn' }}">
+                    Applied
+                </a>
+                <a href="{{ url_for('company.job_applications', job_id=job.job_id, status='Screening') }}"
+                    class="btn btn-sm {{ 'filter-btn-screening' if status_filter == 'Screening' else 'filter-btn' }}">
+                    Screening
+                </a>
+                <a href="{{ url_for('company.job_applications', job_id=job.job_id, status='Shortlisted') }}"
+                    class="btn btn-sm {{ 'filter-btn-shortlisted' if status_filter == 'Shortlisted' else 'filter-btn' }}">
+                    Shortlisted
+                </a>
+                <a href="{{ url_for('company.job_applications', job_id=job.job_id, status='Interview') }}"
+                    class="btn btn-sm {{ 'filter-btn-interview' if status_filter == 'Interview' else 'filter-btn' }}">
+                    Interviewed
+                </a>
+                <a href="{{ url_for('company.job_applications', job_id=job.job_id, status='Hired') }}"
+                    class="btn btn-sm {{ 'filter-btn-hired' if status_filter == 'Hired' else 'filter-btn' }}">
+                    ✅ Hired
+                </a>
+                <a href="{{ url_for('company.job_applications', job_id=job.job_id, status='Rejected') }}"
+                    class="btn btn-sm {{ 'filter-btn-rejected' if status_filter == 'Rejected' else 'filter-btn' }}">
+                    Rejected
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions Form -->
+    <form id="bulkShortlistForm" method="POST" action="{{ url_for('company.bulk_shortlist', job_id=job.job_id) }}">
+        <!-- Bulk Action Bar -->
+        <div class="glass-card mb-3" id="bulkActionBar" style="display: none;">
+            <div class="p-3 d-flex align-items-center justify-content-between"
+                style="background: rgba(99, 102, 241, 0.15);">
+                <div class="d-flex align-items-center">
+                    <span class="me-3 text-white"><strong id="selectedCount">0</strong> candidates selected</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-telephone me-2"></i>Call for Interview
+                    </button>
+                    <button type="button" class="btn btn-outline-light" onclick="clearSelection()">
+                        Clear Selection
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications List -->
+        <div class="glass-card">
+            <div class="p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4" style="width: 50px;">
+                                    <input type="checkbox" class="form-check-input" id="selectAll"
+                                        onchange="toggleSelectAll()">
+                                </th>
+                                <th>Candidate</th>
+                                <th>AI Resume Score</th>
+                                <th>Percentile</th>
+                                <th>Status</th>
+                                <th>Interview</th>
+                                <th>Applied</th>
+                                <th class="pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td class="ps-4">
+                                    {% if not app.interview %}
+                                    <input type="checkbox" class="form-check-input candidate-checkbox"
+                                        name="selected_applications" value="{{ app.app_id }}"
+                                        onchange="updateSelection()">
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle me-2"
+                                            style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                            {{ app.candidate.full_name[0] }}
+                                        </div>
+                                        <div>
+                                            <strong>{{ app.candidate.full_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ app.candidate.user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% set score_class = 'success' if app.ai_resume_score >= 70 else 'warning' if
+                                    app.ai_resume_score >= 50 else 'danger' %}
+                                    {% set score_width = app.ai_resume_score|int %}
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress me-2" style="width:80px;height:10px">
+                                            <div class="progress-bar bg-{{ score_class }}"
+                                                style="width:{{ score_width }}%"></div>
+                                        </div>
+                                        <span class="badge bg-{{ score_class }} fs-6">{{ app.ai_resume_score|round(1)
+                                            }}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if app.interview and app.interview.result and
+                                    app.interview.result.overall_percentile %}
+                                    <span class="badge bg-info">Top {{ (100 -
+                                        app.interview.result.overall_percentile)|round(0) }}%</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span
+                                        class="badge fs-6 bg-{{ 'primary' if app.status == 'Applied' else 'info' if app.status == 'Screening' else 'success' if app.status == 'Shortlisted' else 'warning text-dark' if app.status == 'Interview' else 'danger' if app.status == 'Rejected' else 'success' }}">
+                                        {{ app.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if app.interview %}
+                                    {% if app.interview.is_completed %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Completed
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-clock me-1"></i>Pending
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">ID: {{ app.interview.interview_code }}</small>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ app.applied_at.strftime('%b %d, %Y') }}</small>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('company.company_view_application', app_id=app.app_id) }}"
+                                        class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye me-1"></i>View Details
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <i class="bi bi-inbox display-4 text-muted d-block mb-2"></i>
+                                    <p class="text-muted mb-0">No applications found</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Action Buttons -->
+    {% if applications %}
+    <div class="mt-4 text-center d-flex justify-content-center gap-3">
+        <button type="button" class="btn btn-outline-primary" onclick="calculatePercentiles()">
+            <i class="bi bi-calculator me-2"></i>Recalculate Percentile Rankings
+        </button>
+        <button type="button" class="btn btn-danger" onclick="rejectUnselected()">
+            <i class="bi bi-x-circle me-2"></i>Reject All Unselected
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.candidate-checkbox');
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        updateSelection();
+    }
+
+    function updateSelection() {
+        const checkboxes = document.querySelectorAll('.candidate-checkbox:checked');
+        const count = checkboxes.length;
+        const actionBar = document.getElementById('bulkActionBar');
+        const countSpan = document.getElementById('selectedCount');
+
+        countSpan.textContent = count;
+        actionBar.style.display = count > 0 ? 'block' : 'none';
+    }
+
+    function clearSelection() {
+        document.getElementById('selectAll').checked = false;
+        document.querySelectorAll('.candidate-checkbox').forEach(cb => cb.checked = false);
+        updateSelection();
+    }
+
+    function calculatePercentiles() {
+        fetch('{{ url_for("company.calculate_percentiles", job_id=job.job_id) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error calculating percentiles');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error calculating percentiles');
+            });
+    }
+
+    function rejectUnselected() {
+        if (!confirm('Are you sure you want to reject all candidates who have not been called for interview? This action cannot be undone.')) {
+            return;
+        }
+
+        fetch('{{ url_for("company.reject_unselected", job_id=job.job_id) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error rejecting candidates');
+            });
+    }
+</script>
+{% endblock %}

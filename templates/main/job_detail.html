@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} - JobVibe AI{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.2);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-3">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.main_jobs') }}" class="text-muted">Jobs</a></li>
+                <li class="breadcrumb-item active text-white">{{ job.title }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-start">
+            <div class="d-flex align-items-center justify-content-center rounded-3 me-3" 
+                 style="width: 70px; height: 70px; background: rgba(99, 102, 241, 0.2);">
+                <span style="font-size: 2rem;">🏢</span>
+            </div>
+            <div>
+                <h1 class="text-white fw-bold mb-1">{{ job.title }}</h1>
+                <h5 class="text-muted mb-2">{{ job.company.company_name }}</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">{{ job.job_type }}</span>
+                    {% if job.location %}
+                    <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.8);">
+                        <i class="bi bi-geo-alt me-1"></i>{{ job.location }}
+                    </span>
+                    {% endif %}
+                    {% if job.salary_range %}
+                    <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.8);">
+                        <i class="bi bi-currency-dollar me-1"></i>{{ job.salary_range }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Job Description -->
+            <div class="glass-card mb-4">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 fw-semibold text-white">
+                        <span class="me-2">📋</span>Job Description
+                    </h5>
+                </div>
+                <div class="p-4">
+                    <div class="job-description text-muted">
+                        {{ job.description | safe }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Requirements -->
+            <div class="glass-card mb-4">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 fw-semibold text-white">
+                        <span class="me-2">✅</span>Requirements
+                    </h5>
+                </div>
+                <div class="p-4">
+                    <div class="requirements text-muted">
+                        {{ job.requirements | safe }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Responsibilities -->
+            {% if job.responsibilities %}
+            <div class="glass-card mb-4">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 fw-semibold text-white">
+                        <span class="me-2">💼</span>Responsibilities
+                    </h5>
+                </div>
+                <div class="p-4">
+                    <div class="responsibilities text-muted">
+                        {{ job.responsibilities | safe }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Skills -->
+            {% if job.skills_required %}
+            <div class="glass-card mb-4">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h5 class="mb-0 fw-semibold text-white">
+                        <span class="me-2">🛠️</span>Skills Required
+                    </h5>
+                </div>
+                <div class="p-4">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for skill in job.skills_required.split(',') %}
+                        <span class="badge fs-6" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">
+                            {{ skill.strip() }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Apply Card - Only show for candidates and guests -->
+            {% if not (current_user.is_authenticated and current_user.role == 'Company') %}
+            <div class="glass-card mb-4 sticky-top" style="top: 80px;">
+                <div class="p-3" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3)); border-radius: 16px 16px 0 0;">
+                    <h5 class="mb-0 text-white fw-semibold">Apply Now</h5>
+                </div>
+                <div class="p-4">
+                    {% if has_applied %}
+                    <div class="alert alert-success mb-3" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <span class="me-2">✅</span>
+                        You have already applied!
+                    </div>
+                    <a href="{{ url_for('candidate.candidate_dashboard') }}" class="btn btn-outline-light w-100">
+                        View My Applications
+                    </a>
+                    {% elif current_user.is_authenticated and current_user.role == 'Candidate' %}
+                    <a href="{{ url_for('candidate.apply', job_id=job.job_id) }}" 
+                       class="btn btn-primary btn-lg w-100 mb-3">
+                        🚀 Apply Now
+                    </a>
+                    <p class="text-muted small text-center mb-0">
+                        <span class="me-1">⚡</span>
+                        AI-powered resume screening included
+                    </p>
+                    {% else %}
+                    <a href="{{ url_for('auth.candidate_login') }}?next={{ request.path }}" 
+                       class="btn btn-primary btn-lg w-100 mb-2">
+                        Login to Apply
+                    </a>
+                    <p class="text-center mb-0">
+                        <small class="text-muted">
+                            Don't have an account? 
+                            <a href="{{ url_for('auth.candidate_register') }}" class="fw-semibold" style="color: #a5b4fc;">Register as Candidate</a>
+                        </small>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Job Info Card -->
+            <div class="glass-card mb-4">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h6 class="mb-0 fw-semibold text-white"><span class="me-2">📊</span>Job Details</h6>
+                </div>
+                <div class="p-4">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3 d-flex align-items-center">
+                            <span class="me-2">📅</span>
+                            <div>
+                                <small class="text-muted d-block">Posted</small>
+                                <span class="fw-medium text-white">{{ job.created_at.strftime('%B %d, %Y') }}</span>
+                            </div>
+                        </li>
+                        {% if job.deadline %}
+                        <li class="mb-3 d-flex align-items-center">
+                            <span class="me-2">⏰</span>
+                            <div>
+                                <small class="text-muted d-block">Deadline</small>
+                                <span class="fw-medium text-white">{{ job.deadline.strftime('%B %d, %Y') }}</span>
+                            </div>
+                        </li>
+                        {% endif %}
+                        <li class="mb-3 d-flex align-items-center">
+                            <span class="me-2">👥</span>
+                            <div>
+                                <small class="text-muted d-block">Applicants</small>
+                                <span class="fw-medium text-white">{{ job.application_count }}</span>
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <span class="me-2">🏭</span>
+                            <div>
+                                <small class="text-muted d-block">Industry</small>
+                                <span class="fw-medium text-white">{{ job.company.industry or 'Not specified' }}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Company Info Card -->
+            <div class="glass-card">
+                <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <h6 class="mb-0 fw-semibold text-white"><span class="me-2">🏢</span>About {{ job.company.company_name }}</h6>
+                </div>
+                <div class="p-4">
+                    {% if job.company.description %}
+                    <p class="text-muted small">{{ job.company.description[:200] }}...</p>
+                    {% endif %}
+                    <ul class="list-unstyled mb-0">
+                        {% if job.company.industry %}
+                        <li class="mb-2 text-muted">
+                            <i class="bi bi-briefcase me-2"></i>
+                            {{ job.company.industry }}
+                        </li>
+                        {% endif %}
+                        {% if job.company.location %}
+                        <li class="mb-2 text-muted">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            {{ job.company.location }}
+                        </li>
+                        {% endif %}
+                        {% if job.company.employee_count %}
+                        <li class="mb-2 text-muted">
+                            <i class="bi bi-people me-2"></i>
+                            {{ job.company.employee_count }} employees
+                        </li>
+                        {% endif %}
+                        {% if job.company.website %}
+                        <li>
+                            <i class="bi bi-globe me-2 text-muted"></i>
+                            <a href="{{ job.company.website }}" target="_blank" style="color: #a5b4fc;">Website</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - JobVibe AI{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="glass-card p-5">
+                    <div style="font-size: 6rem;" class="mb-3">⚠️</div>
+                    <h1 class="display-3 fw-bold" style="color: #ef4444;">500</h1>
+                    <h2 class="mb-3 fw-semibold text-white">Something Went Wrong</h2>
+                    <p class="text-muted mb-4">
+                        We're experiencing technical difficulties. Please try again later.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-danger btn-lg">
+                            🏠 Go Home
+                        </a>
+                        <button onclick="location.reload()" class="btn btn-outline-light btn-lg">
+                            🔄 Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

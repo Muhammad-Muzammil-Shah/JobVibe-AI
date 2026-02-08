@@ -1,0 +1,552 @@
+{% extends "base.html" %}
+
+{% block title %}Start Interview - JobVibe AI{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    * {
+        font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%) !important;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .navbar, footer {
+        display: none !important;
+    }
+    
+    .ready-container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 24px;
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* Header */
+    .ready-header {
+        text-align: center;
+        margin-bottom: 48px;
+    }
+    
+    .brand-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.1));
+        padding: 10px 24px;
+        border-radius: 100px;
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        margin-bottom: 32px;
+    }
+    
+    .brand-badge span {
+        color: #a5b4fc;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .ready-title h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        letter-spacing: 6px;
+        margin: 0;
+        background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #67e8f9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: none;
+        filter: drop-shadow(0 0 40px rgba(99, 102, 241, 0.3));
+    }
+    
+    .ready-subtitle {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.1rem;
+        margin-top: 16px;
+        font-weight: 400;
+    }
+    
+    /* Permissions Grid */
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+    
+    .permission-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 28px 24px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .permission-card:hover {
+        border-color: rgba(99, 102, 241, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    .permission-card.granted {
+        border-color: rgba(16, 185, 129, 0.4);
+        background: rgba(16, 185, 129, 0.05);
+    }
+    
+    .permission-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.1));
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+    
+    .permission-card.granted .permission-icon {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.1));
+    }
+    
+    .permission-title {
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+    
+    .permission-desc {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+    }
+    
+    .permission-btn {
+        background: rgba(99, 102, 241, 0.15);
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        border-radius: 100px;
+        padding: 12px 28px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        color: #a5b4fc;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .permission-btn:hover {
+        background: rgba(99, 102, 241, 0.25);
+        border-color: rgba(99, 102, 241, 0.6);
+        transform: translateY(-1px);
+    }
+    
+    .permission-btn.granted {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-color: #10b981;
+        color: white;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .permission-status {
+        font-size: 0.8rem;
+        margin-top: 14px;
+        color: rgba(255, 255, 255, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .permission-status.ready {
+        color: #10b981;
+    }
+    
+    .permission-status.denied {
+        color: #ef4444;
+    }
+    
+    /* System Status Card */
+    .system-status {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 20px 28px;
+        margin-bottom: 28px;
+    }
+    
+    .status-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    
+    .status-header i {
+        color: #6366f1;
+        font-size: 1.1rem;
+    }
+    
+    .status-header h5 {
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    
+    .status-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .status-label {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+    }
+    
+    .status-value {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+        padding: 6px 14px;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .status-value.offline {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+    
+    /* Start Button */
+    .start-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        padding: 20px 32px;
+        font-size: 1.15rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+        letter-spacing: 0.5px;
+    }
+    
+    .start-btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 50px rgba(99, 102, 241, 0.5);
+    }
+    
+    .start-btn:disabled {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.3);
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    .start-btn i {
+        font-size: 1.3rem;
+    }
+    
+    /* Tips Section */
+    .tips-section {
+        margin-top: 36px;
+        padding-top: 28px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .tips-title {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 16px;
+        text-align: center;
+    }
+    
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+    
+    .tip-item {
+        text-align: center;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .tip-item i {
+        font-size: 1.5rem;
+        color: #67e8f9;
+        margin-bottom: 8px;
+    }
+    
+    .tip-item p {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.8rem;
+        margin: 0;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .permissions-grid {
+            grid-template-columns: 1fr;
+        }
+        .tips-grid {
+            grid-template-columns: 1fr;
+        }
+        .ready-title h1 {
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ready-container">
+    <div class="ready-header">
+        <div class="brand-badge">
+            <i class="bi bi-briefcase-fill" style="color: #a5b4fc;"></i>
+            <span>JobVibe AI Interview</span>
+        </div>
+        <div class="ready-title">
+            <h1>GET READY</h1>
+        </div>
+        <p class="ready-subtitle">Grant permissions below to start your AI-powered interview</p>
+    </div>
+    
+    <!-- Permissions Grid -->
+    <div class="permissions-grid">
+        <!-- Camera Access -->
+        <div class="permission-card" id="cameraCard">
+            <div class="permission-icon">📹</div>
+            <div class="permission-title">Camera Access</div>
+            <p class="permission-desc">Required for video recording</p>
+            <button class="permission-btn" id="cameraBtn" onclick="requestCamera()">
+                <i class="bi bi-camera-video"></i>
+                Enable Camera
+            </button>
+            <p class="permission-status" id="cameraStatus">
+                <i class="bi bi-hourglass-split"></i> Waiting for permission
+            </p>
+        </div>
+        
+        <!-- Microphone Access -->
+        <div class="permission-card" id="micCard">
+            <div class="permission-icon">🎤</div>
+            <div class="permission-title">Microphone Access</div>
+            <p class="permission-desc">Required for audio recording</p>
+            <button class="permission-btn" id="micBtn" onclick="requestMicrophone()">
+                <i class="bi bi-mic"></i>
+                Enable Microphone
+            </button>
+            <p class="permission-status" id="micStatus">
+                <i class="bi bi-hourglass-split"></i> Waiting for permission
+            </p>
+        </div>
+    </div>
+    
+    <!-- System Status -->
+    <div class="system-status">
+        <div class="status-header">
+            <i class="bi bi-gear"></i>
+            <h5>System Status</h5>
+        </div>
+        <div class="status-items">
+            <div class="status-item">
+                <span class="status-label">Internet:</span>
+                <span class="status-value" id="connectionStatus">
+                    <i class="bi bi-wifi"></i> Connected
+                </span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Browser:</span>
+                <span class="status-value">
+                    <i class="bi bi-check-circle"></i> Compatible
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Start Button -->
+    <button class="start-btn" id="startBtn" disabled onclick="startInterview()">
+        <i class="bi bi-play-circle"></i>
+        Start Interview
+        <i class="bi bi-arrow-right"></i>
+    </button>
+    
+    <!-- Tips Section -->
+    <div class="tips-section">
+        <div class="tips-title">Interview Tips</div>
+        <div class="tips-grid">
+            <div class="tip-item">
+                <i class="bi bi-lightbulb"></i>
+                <p>Good lighting</p>
+            </div>
+            <div class="tip-item">
+                <i class="bi bi-volume-mute"></i>
+                <p>Quiet environment</p>
+            </div>
+            <div class="tip-item">
+                <i class="bi bi-person-bounding-box"></i>
+                <p>Face clearly visible</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden video for camera preview -->
+<video id="previewVideo" style="display: none;" autoplay muted playsinline></video>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Permission states
+    let cameraGranted = false;
+    let micGranted = false;
+    let mediaStream = null;
+    
+    const interviewUrl = "{{ url_for('interview.room', interview_id=interview.interview_id) }}";
+    
+    // DOM Elements
+    const cameraBtn = document.getElementById('cameraBtn');
+    const micBtn = document.getElementById('micBtn');
+    const startBtn = document.getElementById('startBtn');
+    const previewVideo = document.getElementById('previewVideo');
+    const cameraCard = document.getElementById('cameraCard');
+    const micCard = document.getElementById('micCard');
+    
+    // Request Camera
+    async function requestCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            mediaStream = stream;
+            previewVideo.srcObject = stream;
+            
+            cameraGranted = true;
+            cameraBtn.classList.add('granted');
+            cameraBtn.innerHTML = '<i class="bi bi-check-lg"></i> Camera Enabled';
+            cameraCard.classList.add('granted');
+            document.getElementById('cameraStatus').innerHTML = '<i class="bi bi-check-circle-fill"></i> Permission granted';
+            document.getElementById('cameraStatus').className = 'permission-status ready';
+            
+            checkAllPermissions();
+        } catch (err) {
+            document.getElementById('cameraStatus').innerHTML = '<i class="bi bi-x-circle-fill"></i> Permission denied';
+            document.getElementById('cameraStatus').className = 'permission-status denied';
+        }
+    }
+    
+    // Request Microphone
+    async function requestMicrophone() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            if (mediaStream) {
+                stream.getAudioTracks().forEach(track => mediaStream.addTrack(track));
+            } else {
+                mediaStream = stream;
+            }
+            
+            micGranted = true;
+            micBtn.classList.add('granted');
+            micBtn.innerHTML = '<i class="bi bi-check-lg"></i> Microphone Enabled';
+            micCard.classList.add('granted');
+            document.getElementById('micStatus').innerHTML = '<i class="bi bi-check-circle-fill"></i> Permission granted';
+            document.getElementById('micStatus').className = 'permission-status ready';
+            
+            checkAllPermissions();
+        } catch (err) {
+            document.getElementById('micStatus').innerHTML = '<i class="bi bi-x-circle-fill"></i> Permission denied';
+            document.getElementById('micStatus').className = 'permission-status denied';
+        }
+    }
+    
+    // Check if all permissions granted
+    function checkAllPermissions() {
+        if (cameraGranted && micGranted) {
+            startBtn.disabled = false;
+        }
+    }
+    
+    // Start Interview
+    function startInterview() {
+        sessionStorage.setItem('mediaStreamReady', 'true');
+        
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().then(() => {
+                window.location.href = interviewUrl;
+            }).catch(err => {
+                window.location.href = interviewUrl;
+            });
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+            window.location.href = interviewUrl;
+        } else {
+            window.location.href = interviewUrl;
+        }
+    }
+    
+    // Check connection status
+    function updateConnectionStatus() {
+        const statusEl = document.getElementById('connectionStatus');
+        if (navigator.onLine) {
+            statusEl.innerHTML = '<i class="bi bi-wifi"></i> Connected';
+            statusEl.classList.remove('offline');
+        } else {
+            statusEl.innerHTML = '<i class="bi bi-wifi-off"></i> Offline';
+            statusEl.classList.add('offline');
+        }
+    }
+    
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+    updateConnectionStatus();
+</script>
+{% endblock %}
