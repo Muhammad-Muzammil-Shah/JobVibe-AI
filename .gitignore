@@ -28,8 +28,8 @@ uploads/videos/*
 !uploads/resumes/.gitkeep
 !uploads/videos/.gitkeep
 
-# ML Models (too large for git)
-emotion_model.h5
+# ML Models (keep - only ~10MB)
+# emotion_model.h5
 
 # OS files
 .DS_Store
