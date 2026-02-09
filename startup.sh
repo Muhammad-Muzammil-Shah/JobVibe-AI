@@ -27,14 +27,23 @@ print('NLTK data downloaded.')
 mkdir -p /home/site/wwwroot/uploads/resumes
 mkdir -p /home/site/wwwroot/uploads/videos
 
-# Run database migrations
+# Run database migrations and seed if empty
 python -c "
 from app import create_app
-from models import db
+from models import db, User
 app = create_app('production')
 with app.app_context():
     db.create_all()
     print('Database tables created/verified.')
+    
+    # Auto-seed if database is empty
+    user_count = User.query.count()
+    if user_count == 0:
+        print('Database is empty, running seed...')
+        from seed_database import seed
+        seed()
+    else:
+        print(f'Database already has {user_count} users, skipping seed.')
 "
 
 # Start gunicorn
