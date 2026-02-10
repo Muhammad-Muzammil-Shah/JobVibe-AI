@@ -609,6 +609,7 @@ def dashboard_bulk_interview():
             print(f"Error processing application {app_id}: {e}")
             import traceback
             traceback.print_exc()
+            db.session.rollback()
             error_count += 1
             continue
     
@@ -1371,7 +1372,6 @@ def create_interview_for_application(application, resume_text, job):
             )
             db.session.add(question)
         
-        db.session.commit()
         db.session.commit()
         print(f"✅ Interview created! Code: {interview.interview_code} | Candidate: {application.candidate.full_name} | Position: {job.title}")
         return interview

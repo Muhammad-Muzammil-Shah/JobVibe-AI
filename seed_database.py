@@ -3,23 +3,20 @@ Seed Database Script
 Adds 5 companies, 5 candidates, and sample jobs to the database.
 Run: python seed_database.py
 """
-from app import create_app
 from models import db, User, Company, Candidate, Job, Application, Interview, InterviewQuestion
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import os
 
 def seed():
-    # Use production config if USE_AZURE_SQL is set, otherwise development
-    config_name = 'production' if os.environ.get('USE_AZURE_SQL', 'false').lower() == 'true' else 'development'
-    app = create_app(config_name)
+    # Import the module-level app (avoid creating a duplicate)
+    from app import app as flask_app
     
-    with app.app_context():
+    with flask_app.app_context():
         print("\n" + "="*60)
         print("   SEEDING DATABASE...")
         print("="*60)
-        print(f"   Config: {config_name}")
-        print(f"   DB: {app.config['SQLALCHEMY_DATABASE_URI'][:50]}...")
+        print(f"   DB: {flask_app.config['SQLALCHEMY_DATABASE_URI'][:50]}...")
         
         # Create tables if not exists
         db.create_all()

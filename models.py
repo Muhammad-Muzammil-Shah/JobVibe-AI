@@ -24,7 +24,7 @@ class User(UserMixin, db.Model):  # type: ignore
     user_id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.Enum('Company', 'Candidate', name='user_role'), nullable=False)
+    role = db.Column(db.String(20), nullable=False)  # 'Company' or 'Candidate'
     active = db.Column(db.Boolean, default=True)  # Renamed from is_active to avoid UserMixin conflict
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -126,7 +126,7 @@ class Job(db.Model):  # type: ignore
     responsibilities = db.Column(db.Text)
     location = db.Column(db.String(200))
     work_mode = db.Column(db.String(20), default='Onsite')  # Onsite, Remote, Hybrid
-    job_type = db.Column(db.Enum('Full-time', 'Part-time', 'Contract', 'Internship', name='job_type'), default='Full-time')
+    job_type = db.Column(db.String(20), default='Full-time')  # Full-time, Part-time, Contract, Internship
     experience_required = db.Column(db.String(50))
     education_required = db.Column(db.String(200))  # Education requirement
     salary_min = db.Column(db.Integer)  # Minimum salary
@@ -181,7 +181,7 @@ class Application(db.Model):  # type: ignore
     cover_letter = db.Column(db.Text)
     ai_resume_score = db.Column(db.Float, default=0.0)
     resume_analysis = db.Column(db.Text)  # JSON string with detailed analysis
-    status = db.Column(db.Enum('Applied', 'Screening', 'Shortlisted', 'Interview', 'Rejected', 'Hired', name='app_status'), default='Applied')
+    status = db.Column(db.String(20), default='Applied')  # Applied, Screening, Shortlisted, Interview, Rejected, Hired
     applied_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -258,9 +258,9 @@ class InterviewQuestion(db.Model):  # type: ignore
     question_id = db.Column(db.Integer, primary_key=True)
     interview_id = db.Column(db.Integer, db.ForeignKey('interviews.interview_id', ondelete='CASCADE'), nullable=False)
     question_text = db.Column(db.Text, nullable=False)
-    question_type = db.Column(db.Enum('Technical', 'Behavioral', 'Situational', 'General', name='question_type'), default='Technical')
+    question_type = db.Column(db.String(20), default='Technical')  # Technical, Behavioral, Situational, General
     expected_keywords = db.Column(db.Text)  # Comma-separated keywords for evaluation
-    difficulty = db.Column(db.Enum('Easy', 'Medium', 'Hard', name='difficulty'), default='Medium')
+    difficulty = db.Column(db.String(10), default='Medium')  # Easy, Medium, Hard
     question_order = db.Column(db.Integer, nullable=False)
     time_limit_seconds = db.Column(db.Integer, default=120)
     
@@ -306,7 +306,7 @@ class CandidateResult(db.Model):  # type: ignore
     overall_percentile = db.Column(db.Float, default=0.0)
     
     # HR Decision
-    hr_decision = db.Column(db.Enum('Pending', 'Selected', 'Rejected', 'On-Hold', name='hr_decision'), default='Pending')
+    hr_decision = db.Column(db.String(20), default='Pending')  # Pending, Selected, Rejected, On-Hold
     hr_notes = db.Column(db.Text)
     decided_at = db.Column(db.DateTime)
     decided_by = db.Column(db.Integer, db.ForeignKey('users.user_id'))
@@ -359,7 +359,7 @@ class Notification(db.Model):
     
     notification_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
-    notification_type = db.Column(db.Enum('interview_invite', 'status_update', 'reminder', 'system', name='notification_type'), nullable=False)
+    notification_type = db.Column(db.String(30), nullable=False)  # interview_invite, status_update, reminder, system
     title = db.Column(db.String(200), nullable=False)
     message = db.Column(db.Text, nullable=False)
     

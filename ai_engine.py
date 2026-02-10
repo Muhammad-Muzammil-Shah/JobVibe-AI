@@ -612,6 +612,9 @@ class AIEngine:
         return self.groq.analyze_answer(question, transcript, expected_keywords)
 
 
+# Module-level instance for import (used by routes.py)
+ai_engine = AIEngine()
+
 # Utility function for testing
 def test_ai_engine():
     """Test the AI engine components"""

@@ -5,6 +5,13 @@
 
 echo "=== Starting AI-Based Interview App ==="
 
+# Install FFmpeg (required for video/audio processing)
+if ! command -v ffmpeg &> /dev/null; then
+    echo "Installing FFmpeg..."
+    apt-get update -qq
+    apt-get install -y -qq ffmpeg 2>/dev/null || true
+fi
+
 # Install ODBC Driver for SQL Server (if using Azure SQL)
 # Azure App Service Linux containers may not have it pre-installed
 if ! odbcinst -q -d | grep -q "ODBC Driver 18 for SQL Server"; then
@@ -29,9 +36,8 @@ mkdir -p /home/site/wwwroot/uploads/videos
 
 # Run database migrations and seed if empty
 python -c "
-from app import create_app
+from app import app
 from models import db, User
-app = create_app('production')
 with app.app_context():
     db.create_all()
     print('Database tables created/verified.')
