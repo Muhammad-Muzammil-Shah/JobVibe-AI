@@ -653,11 +653,13 @@ def init_db():
 
 
 # Run the application
+# Expose 'app' at module level for Azure App Service / Gunicorn auto-detection
+app = create_app()
+
 if __name__ == '__main__':
     import sys
     
     if len(sys.argv) > 1 and sys.argv[1] == 'init':
         init_db()
     else:
-        app = create_app()
         app.run(debug=True, host='0.0.0.0', port=5000)

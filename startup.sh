@@ -46,6 +46,7 @@ with app.app_context():
         print(f'Database already has {user_count} users, skipping seed.')
 "
 
-# Start gunicorn
-echo "Starting Gunicorn..."
-gunicorn --bind=0.0.0.0:8000 --timeout 600 --workers 2 --threads 4 'app:create_app("production")'
+# Start gunicorn - use Azure's PORT env variable (default 8000)
+PORT=${PORT:-8000}
+echo "Starting Gunicorn on port $PORT..."
+gunicorn --bind=0.0.0.0:$PORT --timeout 600 --workers 2 --threads 4 app:app

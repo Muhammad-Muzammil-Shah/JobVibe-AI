@@ -76,8 +76,21 @@ class ProductionConfig(Config):
     # Force Azure SQL in production
     USE_AZURE_SQL = os.environ.get('USE_AZURE_SQL', 'true').lower() == 'true'
     
-    # Use PostgreSQL on Azure if DATABASE_URL is set (Azure App Service default)
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or Config.SQLALCHEMY_DATABASE_URI
+    # Production Database URI - build at class definition time from env vars
+    _db_url = os.environ.get('DATABASE_URL')
+    if _db_url:
+        SQLALCHEMY_DATABASE_URI = _db_url
+    elif USE_AZURE_SQL:
+        _server = os.environ.get('AZURE_SQL_SERVER', 'your-server-name.database.windows.net')
+        _database = os.environ.get('AZURE_SQL_DATABASE', 'recruitment_db')
+        _username = os.environ.get('AZURE_SQL_USERNAME', '')
+        _password = os.environ.get('AZURE_SQL_PASSWORD', '')
+        SQLALCHEMY_DATABASE_URI = (
+            f"mssql+pyodbc://{_username}:{_password}@{_server}:1433/{_database}"
+            f"?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
+        )
+    else:
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///recruitment.db'
 
 
 class TestingConfig(Config):

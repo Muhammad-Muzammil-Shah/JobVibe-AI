@@ -13,9 +13,10 @@ pyodbc>=5.0.1
 # AI/ML Libraries
 groq>=0.4.2
 openai-whisper>=20231117
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch>=2.1.0
 torchaudio>=2.1.0
-tensorflow>=2.15.0
+tensorflow-cpu>=2.15.0
 
 # Computer Vision
 opencv-python-headless>=4.8.0

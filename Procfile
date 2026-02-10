@@ -1,1 +1,1 @@
-web: gunicorn --bind=0.0.0.0:8000 --timeout 600 --workers 2 --threads 4 "app:create_app('production')"
+web: gunicorn --bind=0.0.0.0:$PORT --timeout 600 --workers 2 --threads 4 app:app
