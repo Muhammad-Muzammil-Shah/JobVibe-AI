@@ -64,8 +64,13 @@ def create_app(config_name=None):
         os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'resumes'), exist_ok=True)
         os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'videos'), exist_ok=True)
         
-        # Create database tables
-        db.create_all()
+        # Create database tables - don't crash if DB is temporarily unavailable
+        try:
+            db.create_all()
+            print("[APP] Database tables created/verified.")
+        except Exception as e:
+            print(f"[APP] Warning: Could not create database tables on startup: {e}")
+            print("[APP] Tables will be created on first successful database connection.")
     
     # Error handlers
     @app.errorhandler(404)

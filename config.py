@@ -88,9 +88,17 @@ class ProductionConfig(Config):
         SQLALCHEMY_DATABASE_URI = (
             f"mssql+pyodbc://{_username}:{_password}@{_server}:1433/{_database}"
             f"?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
+            f"&Connection+Timeout=30"
         )
     else:
         SQLALCHEMY_DATABASE_URI = 'sqlite:///recruitment.db'
+    
+    # SQLAlchemy engine options for Azure SQL resilience
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,  # Check connection health before using
+        'pool_recycle': 300,    # Recycle connections every 5 minutes
+        'connect_args': {'timeout': 30}
+    }
 
 
 class TestingConfig(Config):
